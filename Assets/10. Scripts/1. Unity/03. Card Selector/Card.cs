@@ -26,6 +26,7 @@ namespace Study.CardSelector
         public State myState;
         
 
+
         void Awake()
         {
             // gameObject 멤버 변수는 특별해서 컴포넌트 객체가
