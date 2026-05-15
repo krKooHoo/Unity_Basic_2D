@@ -9,6 +9,7 @@ namespace Study.PairMatchingGame
         private Card[] cards; //외부에서(PairMatchingGame)에서 주입 받습니다
         public UnityEngine.Transform cursor;
         public int currentIndex = 2;
+        public float cursorYOffset = -0.5f;
 
         private Card selectCardA;
         private Card selectCardB;
@@ -19,28 +20,26 @@ namespace Study.PairMatchingGame
 
             if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
             {
-                MoveCursor(true);
+                MoveCursor(Direction.Left);
             }
             else if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
             {
-                MoveCursor(false);
+                MoveCursor(Direction.Right);
             }
+            else if (Keyboard.current.upArrowKey.wasPressedThisFrame)
+            {
+                MoveCursor(Direction.Up);
+            }
+            else if (Keyboard.current.downArrowKey.wasPressedThisFrame)
+            {
+                MoveCursor(Direction.Down);
+            }
+
 
             if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
                 SelectCard();
             }
-        }
-
-        private void MoveCursor(bool isLeft)
-        {
-            currentIndex += isLeft ? -1 : +1;
-
-            if (currentIndex < 0) currentIndex = cards.Length - 1;
-            if (currentIndex >= cards.Length) currentIndex = 0;
-
-            float cardX = cards[currentIndex].transform.position.x;
-            cursor.position = new Vector3(cardX, cursor.position.y);
         }
 
         private void SelectCard()
@@ -76,11 +75,79 @@ namespace Study.PairMatchingGame
         public bool wasSelectionCompleted = false;
 
 
-        // cards 배열에 존재하지 않는 개체를 건너뛰는 기능을 만들어야 합니다
-
         public void SetBoard(Card[] cardArray)
         {
             cards = cardArray;
+        }
+
+        // cards 배열에 존재하지 않는 개체를 건너뛰는 기능을 만들어야 합니다
+        // currentIndex를 적용하기 전에 해당 배열이 null인지 체크해보면 됩니다
+        private void MoveCursor(bool isLeft)
+        {
+            // temp라는 임시변수에 미리 한번 더해봅시다.
+
+            int temp = currentIndex;
+
+            for (int i = 0; i < cards.Length; ++i)
+            {
+                temp += isLeft ? -1 : +1;
+
+                if (temp < 0) temp = cards.Length - 1;
+                if (temp >= cards.Length) temp = 0;
+
+                // cards[temp]가 null이라면
+                if (cards[temp] == null)
+                {
+                    currentIndex++;
+                    continue;
+                }
+                // cards[temp]가 null이 아니라면
+                else
+                {
+                    // 커서 움직이게 하고 종료
+                    currentIndex = temp;
+                    float cardX = cards[currentIndex].transform.position.x;
+                    float cardY = cards[currentIndex].transform.position.y + cursorYOffset;
+                    cursor.position = new Vector3(cardX, cardY, cursor.position.z);
+                    return;
+                }
+            }
+
+            // 카드가 아무것도 없는 상태
+            currentIndex = -1;
+        }
+
+        public enum Direction
+        {
+            Up, Down, Left, Right
+        }
+
+        // 함수 오버로딩
+        // - 같은 이름의 함수더라도, 사용하는 매개변수가 다르다면
+        // 중복 정의가 가능합니다.
+        // (반환자료형-함수이름-매개변수) => 함수의 시그니쳐라고 보통 말 합니다
+        private void MoveCursor(Direction direction)
+        {
+            const int COLUMN_COUNT = 5;
+
+            switch (direction)
+            {
+                case Direction.Up:
+                    for (int i = 0; i < COLUMN_COUNT; ++i)
+                        MoveCursor(false);
+                    break;
+                case Direction.Down:
+                    for (int i = 0; i < COLUMN_COUNT; ++i)
+                        MoveCursor(true);
+                    break;
+                case Direction.Left:
+                    MoveCursor(true);
+                    break;
+                case Direction.Right:
+                    MoveCursor(false);
+                    break;
+            }
+
         }
     }
 }

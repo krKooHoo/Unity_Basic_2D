@@ -37,8 +37,8 @@ namespace Study.PairMatchingGame
             // 같으면 지우고
             if(a.myNumber == b.myNumber)
             {
-                Destroy(a.gameObject); // a 컴포넌트가 부착된 게임오브젝트를 삭제합니다
-                Destroy(b.gameObject); // b 컴포넌트가 부착된 게임오브젝트를 삭제합니다
+                DeleteCard(a);
+                DeleteCard(b);
 
                 Debug.Log("두 카드가 같습니다");
             }
@@ -53,10 +53,22 @@ namespace Study.PairMatchingGame
             cardSelector.Clear();
         }
 
-        // 객체를 안전하게 삭제하는 기능을 넣어봅시다
+        // 객체를 배열에서 안전하게 삭제하는 기능을 넣어봅시다
         private void DeleteCard(Card target)
         {
+            // 선형탐색을 이용해서 target의 위치를 찾습니다
+            for(int i = 0; i < board.Length; ++i)
+            {
+                // null인곳은 건너 뜁니다.
+                if (board[i] == null) continue;
 
+                // Equals(매개변수) 함수는 "==" 같다고 생각해주세요
+                if (board[i].Equals(target)) 
+                {
+                    board[i] = null;            //먼저 배열에서 비워준 후
+                    Destroy(target.gameObject); // Scene에서 삭제합니다
+                }
+            }
         }
     }
 }
