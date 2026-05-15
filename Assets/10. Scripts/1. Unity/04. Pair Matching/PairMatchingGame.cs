@@ -8,16 +8,12 @@ namespace Study.PairMatchingGame
 {
     public class PairMatchingGame : MonoBehaviour
     {
-        // Card Selector에 의해 선택된 두 카드를 비교합니다.
-        // 같으면 지우고, 다르면 뒤집습니다.
-
+        [Header("Ref Object")]
         public CardSelector cardSelector;
-
-        // CardSelector가 갖고 있던 Card[]을 PairMatchingGame 객체가 관리하도록
-        // 코드를 수정합니다. CardSelector는 외부에서 Card[]을 주입받아서
-        // 동작하게 됩니다
+        public Card[]       board; 
+        public GameObject   clearObject;
         
-        public Card[] board; // 게임 보드라는 의미입니다
+        private int pairMatchingCount = 0; 
 
         private void Awake()
         {
@@ -49,13 +45,13 @@ namespace Study.PairMatchingGame
                 // 인덱스 버퍼를 두개씩 가지고와서 randNum을 대입해줍니다
                 int indexA = indexBuffer[i];
                 int indexB = indexBuffer[i+1];
-                board[indexA].myNumber = (Card.Number)randNum;
-                board[indexB].myNumber = (Card.Number)randNum;
+                board[indexA].number = (Card.Number)randNum;
+                board[indexB].number = (Card.Number)randNum;
             }
 
 
             cardSelector.SetBoard(board);
-            ClearObject.SetActive(false);
+            clearObject.SetActive(false);
         }
 
         private void LateUpdate()
@@ -68,7 +64,7 @@ namespace Study.PairMatchingGame
                 }
             }
 
-            if (cardSelector.wasSelectionCompleted)
+            if (cardSelector.WasSelectionCompleted)
             {
                 Card[] selectedCard = cardSelector.GetSelectedCards();
                 CheckPairMatching(selectedCard[0], selectedCard[1]);
@@ -78,7 +74,7 @@ namespace Study.PairMatchingGame
         private void CheckPairMatching(Card a, Card b)
         {
             // 같으면 지우고
-            if(a.myNumber == b.myNumber)
+            if(a.number == b.number)
             {
                 DeleteCard(a);
                 DeleteCard(b);
@@ -97,7 +93,6 @@ namespace Study.PairMatchingGame
             cardSelector.Clear();
         }
 
-        // 객체를 배열에서 안전하게 삭제하는 기능을 넣어봅시다
         private void DeleteCard(Card target)
         {
             // 선형탐색을 이용해서 target의 위치를 찾습니다
@@ -114,17 +109,13 @@ namespace Study.PairMatchingGame
                 }
             }
         }
-
-        private int pairMatchingCount = 0; //페어매칭이 성공한 순간에 +2 되는 변수.
-        public GameObject ClearObject;
-
-        // 게임이 끝났는지 여부를 검사하는 함수를 만들어봅시다
+        
         private void CheckEnd()
         {
             if (pairMatchingCount >= board.Length)
             {
                 //게임이 끝났다
-                ClearObject.SetActive(true);
+                clearObject.SetActive(true);
 
                 // ~.SetActive(bool 매개변수)
                 // 해당 게임오브젝트의 활성화/비활성화를 제어하는 함수입니다.
@@ -132,8 +123,6 @@ namespace Study.PairMatchingGame
                 // gameObject.SetActive(false); => 게임오브젝트가 비 활성화 됩니다.
             }
         }
-
-
     }
 }
 

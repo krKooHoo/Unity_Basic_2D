@@ -22,10 +22,8 @@ namespace Study.CardSelector
 
         [Header("My Data")]
         public SpriteRenderer cardRenderer;
-        public Number myNumber;
-        public State myState;
-        
-
+        public Number number;
+        public State state;
 
         void Awake()
         {
@@ -48,9 +46,9 @@ namespace Study.CardSelector
             // cardRenderer의 이미지를 알맞게 바꿔준다.
 
             if (state == State.Back)    cardRenderer.sprite = backImage;
-            else                        cardRenderer.sprite = numberImages[(int)myNumber];
+            else                        cardRenderer.sprite = numberImages[(int)number];
 
-            myState = state;
+            this.state = state;
         }
 
         /// <summary>
@@ -58,7 +56,7 @@ namespace Study.CardSelector
         /// </summary>
         public void Flip()
         {
-            if (myState == State.Back)  SetState(State.Front);
+            if (state == State.Back)  SetState(State.Front);
             else                        SetState(State.Back);
         }
     }

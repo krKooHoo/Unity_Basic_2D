@@ -6,17 +6,28 @@ namespace Study.PairMatchingGame
 {
     public class CardSelector : MonoBehaviour
     {
-        private Card[] cards; //외부에서(PairMatchingGame)에서 주입 받습니다
-        public UnityEngine.Transform cursor;
-        public int currentIndex = 2;
-        public float cursorYOffset = -0.5f;
+        public enum Direction
+        {
+            Up, Down, Left, Right
+        }
 
+        [Header("Ref Object")]
+        public UnityEngine.Transform cursor;
+
+        [Header("Settings")]
+        public float cursorYOffset = -0.5f;
+        
+        private Card[] cards; //외부에서(PairMatchingGame)에서 주입 받습니다
+        private int currentIndex = 2;
+        
         private Card selectCardA;
         private Card selectCardB;
 
+        public bool WasSelectionCompleted { get; private set; }
+
         private void Update()
         {
-            wasSelectionCompleted = false;
+            WasSelectionCompleted = false;
 
             if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
             {
@@ -42,26 +53,11 @@ namespace Study.PairMatchingGame
             }
         }
 
-        private void SelectCard()
-        {
-            Card currentCard = cards[currentIndex];
+        #region Public Methods
 
-            if (selectCardA == null)
-            {
-                selectCardA = currentCard;
-            }
-            //같은 카드를 선택되지 않게 합시다.
-            else if (selectCardA == currentCard) 
-            {
-                return;
-            }
-            else
-            {
-                selectCardB = currentCard;
-                wasSelectionCompleted = true;
-            }
-                
-            cards[currentIndex].Flip();
+        public void SetBoard(Card[] cardArray)
+        {
+            cards = cardArray;
         }
 
         /// <summary>
@@ -79,21 +75,34 @@ namespace Study.PairMatchingGame
             selectCardB = null;
         }
 
-        // 이번 프레임에 카드 선택이 완료되었는지 체크하는 bool 변수
-        public bool wasSelectionCompleted = false;
+        #endregion
 
+        #region Private Methods
 
-        public void SetBoard(Card[] cardArray)
+        private void SelectCard()
         {
-            cards = cardArray;
+            Card currentCard = cards[currentIndex];
+
+            if (selectCardA == null)
+            {
+                selectCardA = currentCard;
+            }
+            //같은 카드를 선택되지 않게 합시다.
+            else if (selectCardA == currentCard)
+            {
+                return;
+            }
+            else
+            {
+                selectCardB = currentCard;
+                WasSelectionCompleted = true;
+            }
+
+            cards[currentIndex].Flip();
         }
 
-        // cards 배열에 존재하지 않는 개체를 건너뛰는 기능을 만들어야 합니다
-        // currentIndex를 적용하기 전에 해당 배열이 null인지 체크해보면 됩니다
         private void MoveCursor(bool isLeft)
         {
-            // temp라는 임시변수에 미리 한번 더해봅시다.
-
             int temp = currentIndex;
 
             for (int i = 0; i < cards.Length; ++i)
@@ -125,15 +134,6 @@ namespace Study.PairMatchingGame
             currentIndex = -1;
         }
 
-        public enum Direction
-        {
-            Up, Down, Left, Right
-        }
-
-        // 함수 오버로딩
-        // - 같은 이름의 함수더라도, 사용하는 매개변수가 다르다면
-        // 중복 정의가 가능합니다.
-        // (반환자료형-함수이름-매개변수) => 함수의 시그니쳐라고 보통 말 합니다
         private void MoveCursor(Direction direction)
         {
             const int COLUMN_COUNT = 5;
@@ -157,6 +157,8 @@ namespace Study.PairMatchingGame
             }
 
         }
+
+        #endregion
     }
 }
 
