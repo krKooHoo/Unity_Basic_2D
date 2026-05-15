@@ -46,7 +46,15 @@ namespace Study.PairMatchingGame
         {
             Card currentCard = cards[currentIndex];
 
-            if (selectCardA == null) selectCardA = currentCard;
+            if (selectCardA == null)
+            {
+                selectCardA = currentCard;
+            }
+            //같은 카드를 선택되지 않게 합시다.
+            else if (selectCardA == currentCard) 
+            {
+                return;
+            }
             else
             {
                 selectCardB = currentCard;
